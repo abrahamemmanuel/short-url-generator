@@ -50,3 +50,7 @@ export type decodedShortUrlResponse = {
   encodedUrl: string;
   shortUrl: string;
 }
+
+export type encodeUrlDTO = {
+  longUrl: string;
+}

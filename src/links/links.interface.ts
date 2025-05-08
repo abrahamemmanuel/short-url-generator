@@ -4,7 +4,7 @@ export interface LinksInterface {
   /**
    * Create a short url
    * @param long_url - the url input
-   * @returns Link - the link object
+   * @returns Link - the link record
    */
   encode(long_url: string): Promise<LinkRecord>;
 
@@ -31,8 +31,8 @@ export interface LinksInterface {
 
   /**
    * List all available url
-   * @param url_path - the stat request
-   * @returns Link[] - returns a list of links
+   * @param query - search params at least characters
+   * @returns Link[] - returns a list of link-records
    */
-  list(url_path: string): Promise<LinkRecord[]>;
+  list(query: string): Promise<LinkRecord[]>;
 }

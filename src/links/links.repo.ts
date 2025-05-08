@@ -10,8 +10,8 @@ export class LinksRepository {
    * @param shortKey - the short link key
    * @param data - the link record data
    */
-  save(shortKey: string, data: LinkRecord): void {
-    LinkCache[shortKey] = data;
+  async save(shortKey: string, data: LinkRecord): Promise<void> {
+     LinkCache[shortKey] = data;
   }
 
   /**

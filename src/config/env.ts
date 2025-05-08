@@ -11,6 +11,7 @@ export interface ApplicationEnv extends BasicConfig {
   redis_url: string;
   redis_password?: string;
   amqp_url: string;
+  base_url: string;
 }
 
 const env = loadEnv<ApplicationEnv>({
@@ -28,6 +29,7 @@ const env = loadEnv<ApplicationEnv>({
     .uri({ scheme: ["amqp", "amqps"] })
     .trim()
     .required(),
+  base_url: joi.string().required()
 });
 
 export default env;
