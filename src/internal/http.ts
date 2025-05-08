@@ -16,6 +16,15 @@ export class Controller<T> {
 }
 
 /**
+ * Get the IP address of the client making a request
+ * @param req express request
+ */
+export function getIPAddress(req: Request): string {
+  const xForwardedFor = (req.headers["x-forwarded-for"] || "").toString().replace(/:\d+$/, "") ?? req.ip;
+  return xForwardedFor || req.socket.remoteAddress;
+}
+
+/**
  * Compose middleware into one
  * @param middleware middleware to compose
  */

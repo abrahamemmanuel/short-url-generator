@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { LinkRecord } from "./links.model";
+import { AccessLogs, LinkRecord } from "./links.model";
 
 const LinkCache: Record<string, LinkRecord> = {};
 
@@ -35,16 +35,16 @@ export class LinksRepository {
       const query = search.toLowerCase();
       return values.filter(
         (link) =>
-          link.longUrl.toLowerCase().includes(query) ||
-          link.shortUrl.toLowerCase().includes(query) ||
-          link.urlPath.toLowerCase().includes(query)
+          link.longUrl.toString().toLowerCase().includes(query) ||
+          link.shortUrl.toString().toLowerCase().includes(query) ||
+          link.urlPath.toString().toLowerCase().includes(query)
       );
     }
 
     return values;
   }
 
-  updateStats(shortKey: string, ip: string, browser: string): void {
+  updateStats(shortKey: string, accessLogs: Partial<AccessLogs>): void {
     const link = LinkCache[shortKey];
     if (!link) return;
   
@@ -55,8 +55,15 @@ export class LinksRepository {
     link.statistic.dateTimeAccessed.push(now);
     link.statistic.accessLogs.push({
       timestamp: now,
-      ipAddress: ip,
-      browser: browser,
+      ipAddress: accessLogs.ipAddress,
+      browser: accessLogs.browser,
+      metro: accessLogs.metro,
+      area: accessLogs.area,
+      timezone: accessLogs.timezone,
+      city: accessLogs.city,
+      ll: accessLogs.ll,
+      country: accessLogs.country,
+      region: accessLogs.region
     });
   
     link.updatedAt = now;

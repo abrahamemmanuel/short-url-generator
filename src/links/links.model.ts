@@ -5,12 +5,12 @@ export type LinkRecord = {
   /**
    * The long URL that is shortened
    */
-  longUrl: string;
+  longUrl: URL;
 
   /**
    * The short URL that is generated 
    */
-  shortUrl: string;
+  shortUrl: URL;
 
   /**
    * The path segment of the short URL
@@ -37,6 +37,13 @@ export type AccessLogs = {
   timestamp: string;
   ipAddress: string;
   browser: string;
+  metro: number;
+  area: number;
+  timezone: string;
+  city: string;
+  ll: [number, number];
+  country: string;
+  region: string;
 };
 
 export type Statistic = {
@@ -47,14 +54,18 @@ export type Statistic = {
 };
 
 export type decodedShortUrlResponse = {
-  encodedUrl: string;
-  shortUrl: string;
+  encodedUrl: URL;
+  shortUrl: URL;
 }
 
 export type encodeUrlDTO = {
-  longUrl: string;
+  longUrl: URL;
 }
 
 export type decodeUrlDTO = {
-  shortUrl: string;
+  shortUrl: URL;
+}
+
+export type redirectLinkResponse = {
+  longUrl: URL;
 }

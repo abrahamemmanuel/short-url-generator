@@ -8,13 +8,16 @@ import {
   httpPost,
   request,
   response,
-  requestBody
+  requestBody,
+  requestParam,
+  httpGet
 } from "inversify-express-utils";
-import { isDecodeUrl, isEncodeUrl } from "./links.validator";
+import { isDecodeUrl, isEncodeUrl, isUrlPath } from "./links.validator";
 import { autoValidate } from "@app/http/middleware";
 import { StatusCodes } from "http-status-codes";
+import { ApplicationError } from "@app/internal/errors";
 
-type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse;
+type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | URL;
 
 @controller("/")
 export class LinksController extends Controller<ControllerResponse> {
@@ -34,5 +37,15 @@ export class LinksController extends Controller<ControllerResponse> {
 
     const result = await this.service.decode(shortUrl);
     this.send(req, res, result);
+  }
+
+  @httpGet(":url_path", autoValidate(isUrlPath, "params"))
+  async redirect(@request() req: Request, @response() res: Response, @requestParam("url_path") url_path: string ) {
+    try {
+      const longUrl = await this.service.redirect(url_path, req);
+      res.redirect(longUrl.toString());
+    } catch (err) {
+      throw new ApplicationError(StatusCodes.SERVICE_UNAVAILABLE, "We could not process the request. Please try again later")
+    }
   }
 }

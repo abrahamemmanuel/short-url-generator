@@ -11,3 +11,7 @@ export const isEncodeUrl = joi.object({
 export const isDecodeUrl = joi.object({
   shortUrl: isValidUrl
 });
+
+export const isUrlPath = joi.object({
+  url_path: joi.string().required()
+});
