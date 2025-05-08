@@ -49,10 +49,7 @@ export class LinksService implements LinksInterface {
     const url = new URL(short_url);
     const shortKey = url.pathname.replace(/^\/+/, ""); // remove leading slashes
 
-    const link = await this.repo.find(shortKey);
-    if (!link) {
-      throw new ApplicationError(StatusCodes.NOT_FOUND, `Short URL ${short_url} not found`);
-    }
+    const link = await this.getLinkOrThrowError(shortKey);
 
     return {
       shortUrl: link.shortUrl,
@@ -61,29 +58,35 @@ export class LinksService implements LinksInterface {
   }
 
   async redirect(url_path: string, req: Request): Promise<URL> {
-    const link = this.repo.find(url_path);
-  
-    if (!link) {
-      throw new ApplicationError(StatusCodes.NOT_FOUND, `No link not found with this url path ${url_path}`);
-    }
+    const link = await this.getLinkOrThrowError(url_path);
   
     const ip = getIPAddress(req);
     const ipInfo = await lookup(ip);
     const browser = req.headers["user-agent"] || "Unknown";
   
-    this.repo.updateStats(url_path, { ...ipInfo, browser });
+    await this.repo.updateStats(url_path, { ...ipInfo, browser });
 
     return link.longUrl;
   }
 
-  async statistic(url_path: string): Promise<Partial<LinkRecord>> {
-    // Implement logic using this.repo
-    throw new Error("Method not implemented.");
+  async statistic(url_path: string): Promise<LinkRecord> {
+    return await this.getLinkOrThrowError(url_path);
   }
 
   async list(query: string): Promise<LinkRecord[]> {
     // Implement logic using this.repo
     throw new Error("Method not implemented.");
+  }
+
+  /**
+  * Private helper to fetch a link record or throw error if link record is not found
+  */
+  private async getLinkOrThrowError(url_path: string): Promise<LinkRecord> {
+    const link = await this.repo.find(url_path);
+    if (!link) {
+      throw new ApplicationError(StatusCodes.NOT_FOUND, `No link record found for ${url_path}`);
+    }
+    return link;
   }
 }
 

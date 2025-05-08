@@ -17,11 +17,21 @@ export class Controller<T> {
 
 /**
  * Get the IP address of the client making a request
- * @param req express request
+ * @param req Express request
+ * @returns IP address as a string
  */
 export function getIPAddress(req: Request): string {
-  const xForwardedFor = (req.headers["x-forwarded-for"] || "").toString().replace(/:\d+$/, "") ?? req.ip;
-  return xForwardedFor || req.socket.remoteAddress;
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) {
+    // Could be a comma-separated list of IPs, pick the first
+    const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(",")[0];
+    return ip.trim();
+  }
+
+  const ip = req.socket.remoteAddress || req.connection.remoteAddress || "";
+  
+  // Remove IPv6 prefix if present (e.g., "::ffff:192.168.0.1")
+  return ip.replace(/^.*:/, '') || "127.0.0.1";
 }
 
 /**

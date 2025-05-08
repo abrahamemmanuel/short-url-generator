@@ -1,6 +1,6 @@
 import TYPES from "@app/config/inversify.types";
 import { Controller } from "@app/internal/http";
-import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
+import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService, Statistic } from "@app/links";
 import { Request, Response } from "express";
 import { inject } from "inversify";
 import {
@@ -17,7 +17,7 @@ import { autoValidate } from "@app/http/middleware";
 import { StatusCodes } from "http-status-codes";
 import { ApplicationError } from "@app/internal/errors";
 
-type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | URL;
+type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | Statistic | URL;
 
 @controller("/")
 export class LinksController extends Controller<ControllerResponse> {
@@ -25,17 +25,13 @@ export class LinksController extends Controller<ControllerResponse> {
 
   @httpPost("encode", autoValidate(isEncodeUrl))
   async encode(@request() req: Request, @response() res: Response, @requestBody() dto: encodeUrlDTO ) {
-    const { longUrl } = dto;
-
-    const result = await this.service.encode(longUrl);
+    const result = await this.service.encode(dto.longUrl);
     this.send(req, res, result, StatusCodes.CREATED);
   }
 
   @httpPost("decode", autoValidate(isDecodeUrl))
   async decode(@request() req: Request, @response() res: Response, @requestBody() dto: decodeUrlDTO ) {
-    const { shortUrl } = dto;
-
-    const result = await this.service.decode(shortUrl);
+    const result = await this.service.decode(dto.shortUrl);
     this.send(req, res, result);
   }
 
@@ -47,5 +43,11 @@ export class LinksController extends Controller<ControllerResponse> {
     } catch (err) {
       throw new ApplicationError(StatusCodes.SERVICE_UNAVAILABLE, "We could not process the request. Please try again later")
     }
+  }
+
+  @httpGet("statistic/:url_path", autoValidate(isUrlPath, "params"))
+  async statistic(@request() req: Request, @response() res: Response, @requestParam("url_path") url_path: string ) {
+    const result = await this.service.statistic(url_path);
+    this.send(req, res, result);
   }
 }

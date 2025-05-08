@@ -19,7 +19,7 @@ export class LinksRepository {
    * @param shortKey - the short link key
    * @returns LinkRecord | null
    */
-  find(shortKey: string): LinkRecord | null {
+  async find(shortKey: string): Promise<LinkRecord | null> {
     return LinkCache[shortKey] || null;
   }
 
@@ -28,7 +28,7 @@ export class LinksRepository {
    * @param search - optional search query (min 3 characters)
    * @returns LinkRecord[]
    */
-  getAll(search?: string): LinkRecord[] {
+  async getAll(search?: string): Promise<LinkRecord[]> {
     const values = Object.values(LinkCache);
 
     if (search && search.length >= 3) {
@@ -44,7 +44,14 @@ export class LinksRepository {
     return values;
   }
 
-  updateStats(shortKey: string, accessLogs: Partial<AccessLogs>): void {
+  /**
+   * Update the statistics for a link record by logging an access event.
+   *
+   * @param shortKey - The unique short key (url path) for the short URL.
+   * @param accessLogs - Partial access log information including IP, browser, and optionally geo-location data.
+   * @returns void
+   */
+  async updateStats(shortKey: string, accessLogs: Partial<AccessLogs>): Promise<void> {
     const link = LinkCache[shortKey];
     if (!link) return;
   
@@ -68,5 +75,4 @@ export class LinksRepository {
   
     link.updatedAt = now;
   }
-  
 }
