@@ -9,8 +9,8 @@ import TYPES from "./inversify";
 export class Controller<T> {
   @inject(TYPES.Logger) protected log: Logger;
 
-  protected send(req: Request, res: Response, t: T) {
-    res.status(Status.OK).json(t);
+  protected send(req: Request, res: Response, t: T, statusCode: number = Status.OK) {
+    res.status(statusCode).json(t);
     this.log.response(req, res);
   }
 }

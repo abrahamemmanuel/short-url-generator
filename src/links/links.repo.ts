@@ -19,7 +19,7 @@ export class LinksRepository {
    * @param shortKey - the short link key
    * @returns LinkRecord | null
    */
-  get(shortKey: string): LinkRecord | null {
+  find(shortKey: string): LinkRecord | null {
     return LinkCache[shortKey] || null;
   }
 

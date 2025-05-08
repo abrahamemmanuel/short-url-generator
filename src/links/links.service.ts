@@ -5,6 +5,8 @@ import { LinksInterface } from "./links.interface";
 import { LinksRepository } from "./links.repo";
 import { nanoid } from 'nanoid'
 import env from "@app/config/env";
+import { ApplicationError } from "@app/internal/errors";
+import { StatusCodes } from "http-status-codes";
 
 @injectable()
 export class LinksService implements LinksInterface {
@@ -41,8 +43,18 @@ export class LinksService implements LinksInterface {
   }
 
   async decode(short_url: string): Promise<decodedShortUrlResponse> {
-    // Implement logic using this.repo
-    throw new Error("Method not implemented.");
+    const url = new URL(short_url);
+    const shortKey = url.pathname.replace(/^\/+/, ""); // remove leading slashes
+
+    const link = await this.repo.find(shortKey);
+    if (!link) {
+      throw new ApplicationError(StatusCodes.NOT_FOUND, `Short URL ${short_url} not found`);
+    }
+
+    return {
+      shortUrl: link.shortUrl,
+      encodedUrl: link.longUrl,
+    };
   }
 
   async redirect(url_path: string): Promise<Response> {

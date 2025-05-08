@@ -1,6 +1,6 @@
 import TYPES from "@app/config/inversify.types";
 import { Controller } from "@app/internal/http";
-import { encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
+import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
 import { Request, Response } from "express";
 import { inject } from "inversify";
 import {
@@ -10,12 +10,11 @@ import {
   response,
   requestBody
 } from "inversify-express-utils";
-import { isEncodeUrl } from "./links.validator";
+import { isDecodeUrl, isEncodeUrl } from "./links.validator";
 import { autoValidate } from "@app/http/middleware";
-import { ApplicationError } from "@app/internal/errors";
 import { StatusCodes } from "http-status-codes";
 
-type ControllerResponse = LinkRecord | LinkRecord[];
+type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse;
 
 @controller("/")
 export class LinksController extends Controller<ControllerResponse> {
@@ -23,13 +22,17 @@ export class LinksController extends Controller<ControllerResponse> {
 
   @httpPost("encode", autoValidate(isEncodeUrl))
   async encode(@request() req: Request, @response() res: Response, @requestBody() dto: encodeUrlDTO ) {
-    try {
-      const { longUrl } = dto;
+    const { longUrl } = dto;
 
-      const result = await this.service.encode(longUrl);
-      this.send(req, res, result);
-    } catch (err) {
-      throw new ApplicationError(StatusCodes.SERVICE_UNAVAILABLE, 'We are unable to process this request. Please try again.')
-    }
+    const result = await this.service.encode(longUrl);
+    this.send(req, res, result, StatusCodes.CREATED);
+  }
+
+  @httpPost("decode", autoValidate(isDecodeUrl))
+  async decode(@request() req: Request, @response() res: Response, @requestBody() dto: decodeUrlDTO ) {
+    const { shortUrl } = dto;
+
+    const result = await this.service.decode(shortUrl);
+    this.send(req, res, result);
   }
 }
