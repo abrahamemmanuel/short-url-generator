@@ -10,7 +10,7 @@ export interface ApplicationEnv extends BasicConfig {
   postgres_schema: string;
   redis_url: string;
   redis_password?: string;
-  amqp_url: string;
+  base_url: string;
 }
 
 const env = loadEnv<ApplicationEnv>({
@@ -23,11 +23,7 @@ const env = loadEnv<ApplicationEnv>({
   postgres_schema: joi.string().required(),
   redis_url: joi.string().uri({ scheme: "redis" }).trim().required(),
   redis_password: optionalForDev(),
-  amqp_url: joi
-    .string()
-    .uri({ scheme: ["amqp", "amqps"] })
-    .trim()
-    .required(),
+  base_url: joi.string().required()
 });
 
 export default env;

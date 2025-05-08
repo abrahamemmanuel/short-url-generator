@@ -15,6 +15,8 @@ import { isHealthy } from "./config/health";
 import { createPostgres } from "./config/postgres";
 import { createRedis } from "./config/redis";
 import LIB_TYPES from "./internal/inversify";
+import TYPES from "@app/config/inversify.types";
+import { LinksService, LinksRepository } from "@app/links";
 
 const start = async () => {
   const logger = new Logger({ name: env.service_name, serializers: defaultSerializers("content") });
@@ -44,6 +46,9 @@ const start = async () => {
     container.bind<Redis>(LIB_TYPES.Redis).toConstantValue(redis);
 
     logger.log("successfully connected to redis");
+
+    container.bind<LinksService>(TYPES.LinksService).to(LinksService);
+    container.bind<LinksRepository>(TYPES.LinksRepository).to(LinksRepository);
 
     const app = new App(container, logger, () => isHealthy(pg, redis));
     const appServer = app.server.build();

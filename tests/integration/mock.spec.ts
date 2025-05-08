@@ -21,16 +21,10 @@ let app: Application;
 let pg: Knex;
 let redis: Redis;
 let container: Container;
-let amqpConnection: Connection;
-let channel: Channel;
 
 beforeAll(async () => {
   pg = await createPostgres(logger);
   redis = await createRedis(logger);
-
-  // setup queue bindings
-  amqpConnection = await connect(env.amqp_url);
-  channel = await amqpConnection.createChannel();
 
   container = new Container();
   container.bind<Logger>(LIB_TYPES.Logger).toConstantValue(logger);
@@ -42,7 +36,6 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await redis.flushdb();
-  await channel.purgeQueue(env.send_push_queue);
 
   sinon.resetBehavior();
   sinon.resetHistory();
