@@ -48,7 +48,7 @@ const start = async () => {
     logger.log("successfully connected to redis");
 
     container.bind<LinksService>(TYPES.LinksService).to(LinksService);
-    container.bind<LinksRepository>(TYPES.LinksService).to(LinksRepository);
+    container.bind<LinksRepository>(TYPES.LinksRepository).to(LinksRepository);
 
     const app = new App(container, logger, () => isHealthy(pg, redis));
     const appServer = app.server.build();

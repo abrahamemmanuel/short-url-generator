@@ -22,7 +22,7 @@ export class LinksController extends Controller<ControllerResponse> {
   @inject(TYPES.LinksService) private service: LinksService;
 
   @httpPost("encode", autoValidate(isEncodeUrl))
-  async encodeUrl(@request() req: Request, @response() res: Response, @requestBody() dto: encodeUrlDTO ) {
+  async encode(@request() req: Request, @response() res: Response, @requestBody() dto: encodeUrlDTO ) {
     try {
       const { longUrl } = dto;
 

@@ -3,7 +3,7 @@ import TYPES from "@app/config/inversify.types";
 import { LinkRecord, decodedShortUrlResponse } from "./links.model";
 import { LinksInterface } from "./links.interface";
 import { LinksRepository } from "./links.repo";
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid'
 import env from "@app/config/env";
 
 @injectable()
@@ -11,7 +11,7 @@ export class LinksService implements LinksInterface {
   @inject(TYPES.LinksRepository) repo: LinksRepository;
 
   async encode(long_url: string): Promise<LinkRecord> {
-    const shortKey = nanoid(6); // generate 6-character short ID
+    const shortKey = await nanoid(6); // generate 6-character short ID
 
     // Ensure baseUrl has a trailing slash
     const baseUrl = env.base_url.endsWith("/") ? env.base_url : `${env.base_url}/`; 
