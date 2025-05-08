@@ -77,7 +77,8 @@
     "postgrator": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "response-time": "^2.3.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "fast-geoip": "^1.1.74"
   },
   "_moduleAliases": {
     "@app": "./dist"

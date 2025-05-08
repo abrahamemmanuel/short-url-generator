@@ -9,10 +9,19 @@ import TYPES from "./inversify";
 export class Controller<T> {
   @inject(TYPES.Logger) protected log: Logger;
 
-  protected send(req: Request, res: Response, t: T) {
-    res.status(Status.OK).json(t);
+  protected send(req: Request, res: Response, t: T, statusCode: number = Status.OK) {
+    res.status(statusCode).json(t);
     this.log.response(req, res);
   }
+}
+
+/**
+ * Get the IP address of the client making a request
+ * @param req express request
+ */
+export function getIPAddress(req: Request): string {
+  const xForwardedFor = (req.headers["x-forwarded-for"] || "").toString().replace(/:\d+$/, "") ?? req.ip;
+  return xForwardedFor || req.socket.remoteAddress;
 }
 
 /**

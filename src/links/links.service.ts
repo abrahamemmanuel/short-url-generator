@@ -5,12 +5,17 @@ import { LinksInterface } from "./links.interface";
 import { LinksRepository } from "./links.repo";
 import { nanoid } from 'nanoid'
 import env from "@app/config/env";
+import { ApplicationError } from "@app/internal/errors";
+import { StatusCodes } from "http-status-codes";
+import { lookup } from "fast-geoip";
+import { getIPAddress } from "@app/internal/http";
+import { Request } from "express";
 
 @injectable()
 export class LinksService implements LinksInterface {
   @inject(TYPES.LinksRepository) repo: LinksRepository;
 
-  async encode(long_url: string): Promise<LinkRecord> {
+  async encode(long_url: URL): Promise<LinkRecord> {
     const shortKey = await nanoid(6); // generate 6-character short ID
 
     // Ensure baseUrl does NOT have a trailing slash to prevent malformed URLs
@@ -24,7 +29,7 @@ export class LinksService implements LinksInterface {
 
     const linkData: LinkRecord = {
       longUrl: long_url,
-      shortUrl: shortUrl,
+      shortUrl: new URL(shortUrl),
       urlPath: shortKey,
       createdAt: now,
       updatedAt: now,
@@ -40,14 +45,35 @@ export class LinksService implements LinksInterface {
     return linkData;
   }
 
-  async decode(short_url: string): Promise<decodedShortUrlResponse> {
-    // Implement logic using this.repo
-    throw new Error("Method not implemented.");
+  async decode(short_url: URL): Promise<decodedShortUrlResponse> {
+    const url = new URL(short_url);
+    const shortKey = url.pathname.replace(/^\/+/, ""); // remove leading slashes
+
+    const link = await this.repo.find(shortKey);
+    if (!link) {
+      throw new ApplicationError(StatusCodes.NOT_FOUND, `Short URL ${short_url} not found`);
+    }
+
+    return {
+      shortUrl: link.shortUrl,
+      encodedUrl: link.longUrl,
+    };
   }
 
-  async redirect(url_path: string): Promise<Response> {
-    // Implement logic using this.repo
-    throw new Error("Method not implemented.");
+  async redirect(url_path: string, req: Request): Promise<URL> {
+    const link = this.repo.find(url_path);
+  
+    if (!link) {
+      throw new ApplicationError(StatusCodes.NOT_FOUND, `No link not found with this url path ${url_path}`);
+    }
+  
+    const ip = getIPAddress(req);
+    const ipInfo = await lookup(ip);
+    const browser = req.headers["user-agent"] || "Unknown";
+  
+    this.repo.updateStats(url_path, { ...ipInfo, browser });
+
+    return link.longUrl;
   }
 
   async statistic(url_path: string): Promise<Partial<LinkRecord>> {
@@ -60,3 +86,4 @@ export class LinksService implements LinksInterface {
     throw new Error("Method not implemented.");
   }
 }
+

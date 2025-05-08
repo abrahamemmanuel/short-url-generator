@@ -1,6 +1,6 @@
 import TYPES from "@app/config/inversify.types";
 import { Controller } from "@app/internal/http";
-import { encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
+import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
 import { Request, Response } from "express";
 import { inject } from "inversify";
 import {
@@ -8,14 +8,16 @@ import {
   httpPost,
   request,
   response,
-  requestBody
+  requestBody,
+  requestParam,
+  httpGet
 } from "inversify-express-utils";
-import { isEncodeUrl } from "./links.validator";
+import { isDecodeUrl, isEncodeUrl, isUrlPath } from "./links.validator";
 import { autoValidate } from "@app/http/middleware";
-import { ApplicationError } from "@app/internal/errors";
 import { StatusCodes } from "http-status-codes";
+import { ApplicationError } from "@app/internal/errors";
 
-type ControllerResponse = LinkRecord | LinkRecord[];
+type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | URL;
 
 @controller("/")
 export class LinksController extends Controller<ControllerResponse> {
@@ -23,13 +25,27 @@ export class LinksController extends Controller<ControllerResponse> {
 
   @httpPost("encode", autoValidate(isEncodeUrl))
   async encode(@request() req: Request, @response() res: Response, @requestBody() dto: encodeUrlDTO ) {
-    try {
-      const { longUrl } = dto;
+    const { longUrl } = dto;
 
-      const result = await this.service.encode(longUrl);
-      this.send(req, res, result);
+    const result = await this.service.encode(longUrl);
+    this.send(req, res, result, StatusCodes.CREATED);
+  }
+
+  @httpPost("decode", autoValidate(isDecodeUrl))
+  async decode(@request() req: Request, @response() res: Response, @requestBody() dto: decodeUrlDTO ) {
+    const { shortUrl } = dto;
+
+    const result = await this.service.decode(shortUrl);
+    this.send(req, res, result);
+  }
+
+  @httpGet(":url_path", autoValidate(isUrlPath, "params"))
+  async redirect(@request() req: Request, @response() res: Response, @requestParam("url_path") url_path: string ) {
+    try {
+      const longUrl = await this.service.redirect(url_path, req);
+      res.redirect(longUrl.toString());
     } catch (err) {
-      throw new ApplicationError(StatusCodes.SERVICE_UNAVAILABLE, 'We are unable to process this request. Please try again.')
+      throw new ApplicationError(StatusCodes.SERVICE_UNAVAILABLE, "We could not process the request. Please try again later")
     }
   }
 }
