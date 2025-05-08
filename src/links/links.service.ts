@@ -13,13 +13,13 @@ export class LinksService implements LinksInterface {
   async encode(long_url: string): Promise<LinkRecord> {
     const shortKey = await nanoid(6); // generate 6-character short ID
 
-    // Ensure baseUrl has a trailing slash
-    const baseUrl = env.base_url.endsWith("/") ? env.base_url : `${env.base_url}/`; 
+    // Ensure baseUrl does NOT have a trailing slash to prevent malformed URLs
+    const baseUrl = env.base_url.endsWith("/") ? env.base_url.slice(0, -1) : env.base_url;
 
-    // Avoid including the port for default ports (80 for HTTP, 443 for HTTPS)
-    const port = (env.port && env.port !== 80 && env.port !== 443) ? `:${env.port}` : ""; 
+    // Add port if it's not a default (80/443)
+    const isDefaultPort = (env.port && env.port !== 80 && env.port !== 443)
+    const shortUrl = isDefaultPort ? `${baseUrl}:${env.port}/${shortKey}` : `${baseUrl}/${shortKey}`;
     
-    const shortUrl = `${baseUrl}${port}${shortKey}`;
     const now = new Date().toISOString();
 
     const linkData: LinkRecord = {
