@@ -1,4 +1,4 @@
-import { decodedShortUrlResponse, Link } from "./links.model";
+import { decodedShortUrlResponse, LinkRecord } from "./links.model";
 
 export interface LinksInterface {
   /**
@@ -6,7 +6,7 @@ export interface LinksInterface {
    * @param long_url - the url input
    * @returns Link - the link object
    */
-  encode(long_url: string): Promise<Link>;
+  encode(long_url: string): Promise<LinkRecord>;
 
   /**
    * Get a long url
@@ -27,12 +27,12 @@ export interface LinksInterface {
    * @param url_path - the stat request
    * @returns Stats - stats of the short url path
    */
-  statistic(url_path: string): Promise<Partial<Link>>;
+  statistic(url_path: string): Promise<Partial<LinkRecord>>;
 
   /**
    * List all available url
    * @param url_path - the stat request
    * @returns Link[] - returns a list of links
    */
-  list(url_path: string): Promise<Link[]>;
+  list(url_path: string): Promise<LinkRecord[]>;
 }

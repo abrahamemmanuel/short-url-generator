@@ -1,7 +1,7 @@
 /**
  * Link Model
  */
-export type Link = {
+export type LinkRecord = {
   /**
    * The long URL that is shortened
    */
@@ -33,22 +33,20 @@ export type Link = {
   updatedAt: string;
 };
 
-export type DeviceInfo = {
-  ipAddress: string[];
-  browser: string[];
+export type AccessLogs = {
+  timestamp: string;
+  ipAddress: string;
+  browser: string;
 };
 
 export type Statistic = {
   clickCount: number;
   lastAccessed: string | null;
   dateTimeAccessed: string[]; // ISO strings
-  deviceInfo: DeviceInfo;
+  accessLogs: AccessLogs[];
 };
 
 export type decodedShortUrlResponse = {
   encodedUrl: string;
   shortUrl: string;
 }
-
-
-export const LinkCache: Record<string, any> = {};

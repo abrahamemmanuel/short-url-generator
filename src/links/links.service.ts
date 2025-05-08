@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import TYPES from "@app/config/inversify.types";
-import { Link, decodedShortUrlResponse } from "./links.model";
+import { LinkRecord, decodedShortUrlResponse } from "./links.model";
 import { LinksInterface } from "./links.interface";
 import { LinksRepository } from "./links.repo";
 
@@ -8,7 +8,7 @@ import { LinksRepository } from "./links.repo";
 export class LinksService implements LinksInterface {
   @inject(TYPES.LinksRepository) repo: LinksRepository;
 
-  async encode(long_url: string): Promise<Link> {
+  async encode(long_url: string): Promise<LinkRecord> {
     // Implement logic using this.repo
     throw new Error("Method not implemented.");
   }
@@ -23,12 +23,12 @@ export class LinksService implements LinksInterface {
     throw new Error("Method not implemented.");
   }
 
-  async statistic(url_path: string): Promise<Partial<Link>> {
+  async statistic(url_path: string): Promise<Partial<LinkRecord>> {
     // Implement logic using this.repo
     throw new Error("Method not implemented.");
   }
 
-  async list(url_path: string): Promise<Link[]> {
+  async list(url_path: string): Promise<LinkRecord[]> {
     // Implement logic using this.repo
     throw new Error("Method not implemented.");
   }
