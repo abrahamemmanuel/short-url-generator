@@ -15,3 +15,7 @@ export const isDecodeUrl = joi.object({
 export const isUrlPath = joi.object({
   url_path: joi.string().required()
 });
+
+export const isSearchQuery = joi.object({
+  search: joi.string().allow('').optional()
+});

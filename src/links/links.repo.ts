@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { AccessLogs, LinkRecord } from "./links.model";
+import { looseIncludes } from "@app/internal/loops";
 
 const LinkCache: Record<string, LinkRecord> = {};
 
@@ -31,14 +32,21 @@ export class LinksRepository {
   async getAll(search?: string): Promise<LinkRecord[]> {
     const values = Object.values(LinkCache);
 
-    if (search && search.length >= 3) {
-      const query = search.toLowerCase();
-      return values.filter(
-        (link) =>
-          link.longUrl.toString().toLowerCase().includes(query) ||
-          link.shortUrl.toString().toLowerCase().includes(query) ||
-          link.urlPath.toString().toLowerCase().includes(query)
-      );
+    if (typeof search === 'string' && search.trim().length >= 3) {
+      const query = search.trim().toLowerCase();
+
+      return values.filter((link) => {
+        const longUrl = link.longUrl?.toString().toLowerCase() || '';
+        const shortUrl = link.shortUrl?.toString().toLowerCase() || '';
+        const urlPath = link.urlPath?.toString().toLowerCase() || '';
+
+        return (
+          longUrl.includes(query) ||
+          shortUrl.includes(query) ||
+          urlPath.includes(query) ||
+          looseIncludes(shortUrl, query)
+        );
+      });
     }
 
     return values;

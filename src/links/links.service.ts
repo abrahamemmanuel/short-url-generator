@@ -74,8 +74,7 @@ export class LinksService implements LinksInterface {
   }
 
   async list(query: string): Promise<LinkRecord[]> {
-    // Implement logic using this.repo
-    throw new Error("Method not implemented.");
+    return await this.repo.getAll(query);
   }
 
   /**

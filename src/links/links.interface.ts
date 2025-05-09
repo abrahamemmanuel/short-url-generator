@@ -26,7 +26,7 @@ export interface LinksInterface {
   /**
    * Get the stats of a short url
    * @param url_path - the stat request
-   * @returns Stats - stats of the short url path
+   * @returns Link record - stats of the short url path
    */
   statistic(url_path: string): Promise<Partial<LinkRecord>>;
 
