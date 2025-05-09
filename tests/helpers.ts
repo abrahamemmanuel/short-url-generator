@@ -4,8 +4,6 @@ import { promisify } from "util";
 import { jwt } from "@risemaxi/octonet";
 import { Channel } from "amqplib";
 import parser from "cron-parser";
-import { StatusCodes } from "http-status-codes";
-import jsonwebtoken from "jsonwebtoken";
 import ms from "ms";
 import { JSONCodec, JetStreamManager } from "nats";
 import sinon, { SinonFakeTimers } from "sinon";
@@ -38,10 +36,6 @@ export async function headless(data = {}) {
   return `${env.auth_scheme} ${token}`;
 }
 
-export function generateToken(session: any) {
-  return `Bearer ${jsonwebtoken.sign(session, env.manator_secret)}`;
-}
-
 /**
  * Generate multiple version using a mock data function.
  * @param n number of values to generate
@@ -67,8 +61,8 @@ export async function repeat(n: number, fn: (i: number) => Promise<any>): Promis
   return Promise.all(jobs);
 }
 
-export async function getSuccess<T>(t: Test) {
-  const { body } = await t.expect(StatusCodes.OK);
+export async function getSuccess<T>(t: Test, statusCodes: number = 200) {
+  const { body } = await t.expect(statusCodes);
   return body as T;
 }
 
