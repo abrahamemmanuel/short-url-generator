@@ -1,5 +1,5 @@
 # ShortLink - URL Shortener Service
-
+### Author: Abraham Emmanuel <sundayemmanuelabraham@gmail.com>
 ## Brief
 
 ShortLink is a simple URL shortening service where users can submit long URLs to get shortened URLs. When visiting the shortened URL, users are redirected to the original long URL.

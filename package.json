@@ -2,7 +2,7 @@
   "name": "url-shortener",
   "version": "1.0",
   "description": "URL shortener",
-  "repository": "",
+  "repository": "https://github.com/abrahamemmanuel/short-url-generator.git",
   "author": "Abraham Emmanuel<sundayemmanuelabraham@gmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
