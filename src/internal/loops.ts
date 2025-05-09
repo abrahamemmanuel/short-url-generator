@@ -54,3 +54,17 @@ export async function loopConcurrently<T, U>(ts: T[], fn: (t: T) => Promise<void
   ts.forEach(x => promises.push(fn(x)));
   await Promise.all(promises);
 }
+
+ /**
+ * Loose includes: check if all characters in the query appear in order in the text
+ * e.g. looseIncludes('tt1los', 'tos') => true
+ */
+export const looseIncludes = (text: string, query: string): boolean => {
+  let tIndex = 0;
+  for (let qChar of query) {
+    tIndex = text.indexOf(qChar, tIndex);
+    if (tIndex === -1) return false;
+    tIndex++;
+  }
+  return true;
+};

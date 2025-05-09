@@ -1,6 +1,6 @@
 import TYPES from "@app/config/inversify.types";
 import { Controller } from "@app/internal/http";
-import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService, Statistic } from "@app/links";
+import { decodedShortUrlResponse, decodeUrlDTO, encodeUrlDTO, LinkRecord, LinksService } from "@app/links";
 import { Request, Response } from "express";
 import { inject } from "inversify";
 import {
@@ -10,14 +10,15 @@ import {
   response,
   requestBody,
   requestParam,
-  httpGet
+  httpGet,
+  queryParam
 } from "inversify-express-utils";
-import { isDecodeUrl, isEncodeUrl, isUrlPath } from "./links.validator";
+import { isDecodeUrl, isEncodeUrl, isSearchQuery, isUrlPath } from "./links.validator";
 import { autoValidate } from "@app/http/middleware";
 import { StatusCodes } from "http-status-codes";
 import { ApplicationError } from "@app/internal/errors";
 
-type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | Statistic | URL;
+type ControllerResponse = LinkRecord | LinkRecord[] | decodedShortUrlResponse | URL;
 
 @controller("/")
 export class LinksController extends Controller<ControllerResponse> {
@@ -48,6 +49,12 @@ export class LinksController extends Controller<ControllerResponse> {
   @httpGet("statistic/:url_path", autoValidate(isUrlPath, "params"))
   async statistic(@request() req: Request, @response() res: Response, @requestParam("url_path") url_path: string ) {
     const result = await this.service.statistic(url_path);
+    this.send(req, res, result);
+  }
+
+  @httpGet("", autoValidate(isSearchQuery, "query"))
+  async list(@request() req: Request, @response() res: Response, @queryParam("search") search: string ) {
+    const result = await this.service.list(search);
     this.send(req, res, result);
   }
 }

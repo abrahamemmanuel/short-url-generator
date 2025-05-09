@@ -58,6 +58,8 @@
     "date-fns": "^2.29.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "fast-geoip": "^1.1.74",
+    "fuzzysort": "^3.1.0",
     "helmet": "^5.1.1",
     "http-status-codes": "^2.2.0",
     "inversify": "^6.0.1",
@@ -77,8 +79,7 @@
     "postgrator": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "response-time": "^2.3.2",
-    "uuid": "^8.3.2",
-    "fast-geoip": "^1.1.74"
+    "uuid": "^8.3.2"
   },
   "_moduleAliases": {
     "@app": "./dist"
